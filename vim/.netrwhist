@@ -1,0 +1,11 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =9
+let g:netrw_dirhist_1='/import/modfac_home/bkrull/apps/TURBOMOLE_cf'
+let g:netrw_dirhist_2='/Users/btkrull/devel/TURBOMOLE_cf/dftlib/depend'
+let g:netrw_dirhist_3='/Users/btkrull/Documents/mutable/stmlib'
+let g:netrw_dirhist_4='/Users/btkrull/.emacs.d'
+let g:netrw_dirhist_5='/Users/btkrull/devel/apps/TURBOMOLE/mpilib'
+let g:netrw_dirhist_6='/Users/btkrull/devel/apps/TURBOMOLE/makelib'
+let g:netrw_dirhist_7='/Users/btkrull/devel/apps/TURBOMOLE/mpilib'
+let g:netrw_dirhist_8='/Users/btkrull/devel/apps/TURBOMOLE/config'
+let g:netrw_dirhist_9='/Users/btkrull/Library/Preferences'
