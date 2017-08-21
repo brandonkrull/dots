@@ -18,12 +18,11 @@ export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/bin/:~/bin/:$PATH:~/Dropbo
 export EDITOR=/usr/bin/vim
 export BASHRC=~/.bash_profile
 export VIMRC=~/.vimrc
-export TRASH=~/.Trash/
-export DROPBOX=~/Dropbox/
 export EMACS=/usr/bin/emacs 
 export UNAME=$(uname)
 export TERM=xterm
 
+eval "$(thefuck --alias)"
 alias ll='ls -lhrt'
 alias ..='cd ..' 
 alias diff='colordiff'
@@ -31,12 +30,16 @@ alias model12='ssh -X bkrull@model12.ps.uci.edu'
 alias gp1='ssh -X bkrull@gplogin1.ps.uci.edu'
 alias gp2='ssh -X bkrull@gplogin2.ps.uci.edu'
 alias gp3='ssh -X bkrull@gplogin3.ps.uci.edu'
+alias eos='ssh -X eos03.bc.rzg.mpg.de'
 alias bd=". bd -s"
 alias ssh='TERM=xterm ssh'
 alias v='vim'
+alias math='/Applications/Mathematica.app/Contents/MacOS/WolframKernel'
+alias seasonsearch='ssh -i ~/.seasonsearch/seasonsearch-dev.pem ubuntu@52.42.211.91'
 
 #GIT----------------------------------------------------------------------------
 source ~/.git-completion.bash
+alias git=hub
 
 function git-branch-name {
   git symbolic-ref HEAD 2>/dev/null | cut -d"/" -f 3
@@ -49,16 +52,8 @@ function git-branch-prompt {
 
 #Arch-dep-----------------------------------------------------------------------
 if [ "$UNAME" == "Darwin" ]; then
-#    case "$TERM" in
-#        xterm*|rxvt*)
-            color_prompt=yes
-            PS1="[\[\e[32;1m\]\H \[\e[0m\]\w]\$(git-branch-prompt)\$ "
-#            ;;
-#        *)
-#        ;;
-#    esac
-
-    alias log='emacs $HOME/Dropbox/bin/orgs/phd.org'
+    color_prompt=yes
+    PS1="[\[\e[32;1m\]\H \[\e[0m\]\w]\$(git-branch-prompt)\$ "
 
     source /opt/intel/bin/compilervars.sh intel64 
     export TURBOIMG=$HOME/devel/apps/TURBOIMG
@@ -67,6 +62,16 @@ if [ "$UNAME" == "Darwin" ]; then
     export PATH=$TURBODIR/bin/`sysname`/:$TURBOIMG/bin/`sysname`:/usr/local/bin:$HOME/Dropbox/bin:$HOME/bin:$PATH
     ulimit -s hard
 
+    export PATH=/Users/bkrull/bin/anaconda/bin:/bin:/usr/local/bin:/usr/bin:/usr/sbin:/Applications/Atom.app/Contents/Resources/app/apm/bin:/usr/local/bin:/Users/bkrull/Dropbox/bin:/Users/bkrull/bin:/opt/intel/composer_xe_2015.3.187/bin/intel64:/opt/local/bin:/opt/local/sbin:/Users/bkrull/bin/:/opt/X11/bin:/usr/local/MacGPG2/bin:/Library/TeX/texbin:/Users/bkrull/Dropbox/bin:/opt/intel/composer_xe_2015.3.187/debugger/gdb/intel64/bin:/usr/local/macports/bin
+
+    PATH="/Users/bkrull/perl5/bin${PATH:+:${PATH}}"; export PATH;
+    PERL5LIB="/Users/bkrull/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+    PERL_LOCAL_LIB_ROOT="/Users/bkrull/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+    PERL_MB_OPT="--install_base \"/Users/bkrull/perl5\""; export PERL_MB_OPT;
+    PERL_MM_OPT="INSTALL_BASE=/Users/bkrull/perl5"; export PERL_MM_OPT;
+
+    # added by Anaconda2 4.3.0 installer
+    export PATH="/Users/bkrull/bin/anaconda/anaconda/bin:$PATH"
 elif [ "$UNAME" == "Linux" ]; then
     if [ -x /usr/bin/dircolors ]; then
         eval "`dircolors -b`"
@@ -78,14 +83,8 @@ elif [ "$UNAME" == "Linux" ]; then
         alias fgrep='fgrep --color=auto'
         alias egrep='egrep --color=auto'
     fi
-#    case "$TERM" in
-#        xterm*|rxvt*)
-            color_prompt=yes
-            PS1="[\[\e[31;1m\]\H \[\e[0m\]\w]\$(git-branch-prompt)\$ "
-#            ;;
-#        *)
-#        ;;
-#    esac
+    color_prompt=yes
+    PS1="[\[\e[31;1m\]\H \[\e[0m\]\w]\$(git-branch-prompt)\$ "
 
     BASHRC=$HOME/.bashrc
     WORK=/work/bkrull
