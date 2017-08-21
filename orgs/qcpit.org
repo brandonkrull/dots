@@ -1,0 +1,235 @@
+#+title: Parallel-in-time for Quantum Chemistry
+#+author: Brandon Krull
+#+email: bkrull@lbl.gov
+#+date: January 9, 2017
+#+startup: entitiespretty indent
+
+This project is based on finding ways to use parallel-in-time algorithms
+(parareal, spectral deferred corrections) to speed up RT-TDDFT calculations
+for electron dynamics. 
+
+* Tasks [25%]
+  :PROPERTIES:
+  :COOKIE_DATA: todo recursive
+  :END:
+** TODO Commutator term goes into integrate routine instead of in sweeper
+** TODO Get global arrays to dump dmats to disk
+** Plots [0%]
+*** TODO Plotting scripts for residuals/iterations/error
+*** TODO No. Iterations in expm vs. dt
+*** TODO No. Iterations in picard vs. dt
+*** TODO Error (vs. highly time-resolved 2nd order nwchem) vs. dt
+** TODO Rewrite py.tests for pfasst-nwchem
+** TODO Verify correct solutions (to NWChem)
+   + looks like things are close (~5 digits) if i can get the same fking
+     initial condition
+** TODO Remove all nwc dependencies from pfasst-nwchem
+*** TODO X/Y transform matrices
+*** TODO initial condition
+*** TODO ao/mo sizes
+** DONE build context module in libpfasst in order to read in the data and globalize
+ CLOSED: [2017-08-16 Wed 14:13]
+*** this still requires checking but a basic implementation is in place
+*** still no Vapp (because of complex values)
+*** still need array of ctx_data for different levels
+*** use of pointers/allocatables/target/etc is probably not correct BUT presently, i can initialize an allocated array and assign values to the different integrals based on the python-parsed/dumped nwchem output
+** DONE Add time-dependent portions to fock matrix
+ CLOSED: [2017-02-22 Wed 13:54]
+*** this requires parsing the complex potential that is spit out by NWC
+** DONE fix nwchem output, arrays do not print within array headers
+ CLOSED: [2017-02-22 Wed 13:31]
+*** BS -- if i don't actually write to stdout, it comes out messed up solution: just use cmd | tee output 
+** DONE compute RHS propagation in libpfasst
+ CLOSED: [2017-08-16 Wed 14:14]
+
+
+* Questions 
+1. How is the time actual partitioned? if we're talking about an order of magnitude different at each SDC level, we start to get into too-fine or too-coarse time scales, i.e. is there really a benefit to having sub-attosecond resolution? 
+   i guess people can't really simulate that sort of thing right now. 
+2. This leads to question 2, what processes can we look (attosecond laser experiments) 
+   to really justify this kind of time-resolution? SDC sweeps at nano, femto, attosecond scales? This also means that multi-rate problems should be in the scope, ie nuclear/electron coupled time-regimes. This will be hard, though. tunneling.
+3. These problems can be light/phonon based experiments where short-time response is limited.
+   + predictor-corrector schemes in parareal time-parallel algorithms is 
+     kind of like these generative-adversarial network (GAN) schemes [[https://arxiv.org/pdf/1511.06434v2.pdf][unsupervised
+     representational learning with DCGANs]]. is there a connection here that can
+     be exploited? this is quite different than the traditional model constructed
+     from input data as there is a correction step.
+   + Full-CI (or anything formed as a matrix problem) presents a way to have 
+     effectively an N-D problem that is analogous to an N-D image. This image has
+     particular features that can be extracted/deconvoluted (via neural nets). The
+     thought that doesn't make sense to me is how you could take 'random noise' and
+     have it create a 'real(-ish)' image from it. In this analogy, what is the real 
+     image and how is it created? 
+         \gamma(x_1, x_2, t) = \sum_\mu\nu |\phi(x_1, t)><\phi(x_2, t)| is a 2-d, time-dependent object,
+     where would its data come from?
+   + as opposed to Coulomb matrix metric (see: Rupp et al), maybe a z-matrix
+     approach could be more effective/just as cheap to compute
+4. Casting problem in Liouville space means that we now have a semi-linear problem
+   that can be (in principle) solved by any of the regular ODE/PDE solvers.
+   However, we still need to answer the question as to why the Magnus expansion is
+   almost always chosen for this particular problem. Michael is claiming based on
+   his math bible that the Magnus expansion preserves some property of the Lie
+   group that our solutions live on and thus preserve most importantly the
+   idempotency of the density matrix (which is an unsubstantiated claim made by
+   Lopata, Govind).
+5. I'm going to try to print out P^{2}-P and this shit better be close to zero in their code
+   otherwise there's really no reason for us to really pursue Magnus integration.
+   OR that leaves us with a way to try to fix their problem or at least understand
+   it better.
+
+* Notes
++ Can we instead write a propagation scheme for Omega, rather than the density, 
+  where we can use regular SDC machinery?
++ Tau correction for magnus-picard: each new iteration is just the previous iteration
+  plus the residual (and for multi-level, the restricted residual)
++ Benefits to Picard:
+  + all fevals can be done simultaneously
++ Benefits to SDC:
+  + convergence criteria is stronger
++ Understand the eigenvalue spectrum of propagator for P vs. Omega
++ see nb1p10 for details on structure of code at first glance
++ Maybe it's in our benefit to compute the BCH expansion of $UPU^{\dagger}$
+  + it gives us the ability to do various truncations
+  + can only be performed if $e^{W}Pe^{W}$ is hermitian, not necessarily true if $e^{W}$ is not hermitian
+** On giving talks
+*** mention/credit other people at lbl regularly
+*** make sure to link back to why the work is relevant to DOE/LBL
+*** good rendering of videos
+** OOF90
+   [[http://flibs.sourceforge.net/abstract_point.f90][vector example]]
+   [[http://fortranwiki.org/fortran/show/interface_mod][simple interface
+   example]]
+   [[http://www.fortran90.org/src/best-practices.html#vii-object-oriented-approach][best
+   practices]]
+* Literature
+** Exponential integrators
+** Uses for parallel-in-time
+** attempts at rt-tddft
+*** applications
+**** charge-dynamics of para-nitroaniline
+**** two-electron rabi problem
+**** dmabn - tict states
+     + this might need to be its own story kinda thing 
+     + would like to run some rt-tddft of this guy, see if one can better
+     understand the TICT state's dynamics 
+*** integration methods:
+**** modified midpoint rule
+**** crank-nicholson
+**** first-order leap frog
+**** second order-magnus 
+** fluid dynamics
+** rt-tddft/quantum dynamics/quantum control
+**** [[http://onlinelibrary.wiley.com/doi/10.1002/qua.10554/full][Maday, Turinici, "Parallel in time for quantum control"]]
+**** [[http://www.pnas.org/content/110/41/E3901.short][McClean, Parkhill, Aspuru-Guzik, "Feynman’s clock, a new variational principle, and parallel-in-time quantum dynamics"]]
+**** [[http://aip.scitation.org/doi/full/10.1063/1.4818328][Bylaska, Weare, Weare "Extending molecular simulation time scales: Parallel in time integrations for high-level quantum chemistry and complex force representations"]]
+*** other
+**** [[http://aip.scitation.org/doi/full/10.1063/1.4973380][Yao, Herr, Parkhill, "The many body expansion and neural networks"]]
+** Math
+* Raw writing
+** Intro
+   One of the main focus of high performance computing in the quantum chemistry
+   field is the direct parallelization of the spatial component of the wavefunction
+   (or density in the case of density functional theory). This is an adequate
+   solution for static, non-dynamical processes and modeling, but becomes
+   problematic when real-time properties are of the target. The most
+   straight-forward way to sample time-configuration space is to allocate single
+   trajectories (which may use $M$ multiple processors to parallelize the spatial
+   problem) to a single node, resulting in $N$ nodes for the $N$ different
+   trajectories. 
+
+   In this formulation, each of the $N$ nodes computes the solution to the
+   time-dependent Schr{\"o}dinger equation for each of the prescribed time steps,
+   with each time-step costing as much as the chosen electronic structure method,
+   resulting in a total computational cost of $N*M*t*m$, where $N$ is the total
+   number of trajectories, $M$ is the total number of processors for each
+   electronic structure calculation, $t$ is the total number of time steps, and
+   $m$ is the cost of the electronic structure calculation (for DFT this is
+   generally cubic with respect to system size). In order to have statistically
+   meaningful information, a large number of trajectories (large $N$) are
+   generally needed.
+
+   Calculations of this magnitude are generally limited to molecular systems of
+   small size and for relatively short time lengths. Calculations can be
+   significantly sped up by the use of cheaper methods such as force-field based
+   methods, or by more obviously decreasing the length of time to be simluated.
+
+   An alternate formulation for longer-time simulations of electronic processes
+   is to use so-called parallel-in-time methods. These methods have been
+   traditionally applied to problems in fluid dynamics, where a uniform
+   time-mesh is used. The premise of parallel-in-time methods relies on the use
+   of a combination of methods, with one or more being significantly less
+   computationally expensive than the other. Properties are computed using the
+   cheap, less-accurate method and than iteratively corrected by the more
+   accurate (and more expensive) method. This type of methodology is well-suited
+   for multirate or time multiscale processes. However, if enough orders of
+   magnitude are scanned in time, the types of motion that needs to be
+   considered differs dramatically
+
+** Background
+*** Time-dependent quantum mechanics
+   The dynamics of an arbitrary molecular system is governed by the
+   time-dependent Schr{\"o}dinger equation $i\partial_{t}|\Psi(t)> = H|\Psi(t)>,$ where
+   $|\Psi(t)>=\Phi_{n}\Phi_{s}$ is the total molecular wavefunction consisting of a nuclear
+   wavefunction $\Phi_{n}$ and electronic wavefunction $\Phi_{s}$. In the Born-Oppenheimer
+   approximation, the time scales of the nuclear and electronic wavefunctions can
+   be treated on completely different time scales giving rise to separate
+   equations of motion for each wavefunction. Though much interesting physics is
+   governed on the interaction of the two different time scales, here we are
+   concerned only with the time-evolution of the electronic wavefunction.
+
+   The electronic time-dependent Schr{\"o}dinger equation closely resembles the
+   total molecular TDSE $i\partial_{t}|\Phi_{s}> = H|\Phi_{s}>$. Here, the electronic
+   wavefunction $\Phi_{s}$ lives in an N-dimensional Hilbert space. An alternative
+   formulation that significantly reduces the computational complexity of dealing
+   with an $N$-D Hilbert space requires the use of the one-body reduced density
+   matrix $\gamma=|\Phi_{s}><\Phi_{s}$. The TDSE is then rewritten in terms of $\gamma$ in the
+   form of the von Neumann equation of motion $\partial_{t}\gamma(t)=-i[H,\gamma],$ where
+   the square brackets indicate the matrix commutator. The goal of the present
+   work is to determine $\gamma(t)$ for a time-dependent Hamiltonian that represents a
+   molecular system interacting with a time-dependent field.
+
+   Pragmatically speaking, the difference between linear response TDDFT
+   (LR-TDDFT) and real-time TDDFT (RT-TDDFT) is the choice of frequency space
+   versus time space. Both pictures aim to solve the same set of
+   single-particle equations, the time-dependent Kohn-Sham (TDKS) equations
+   $i\partial_{t}\psi_{i}(\mathbf{r},t) = \left[-\frac{1}{2}\nabla^{2} + v_{KS}[\rho](\mathbf{r},t)\right]\psi_{i}(\mathbf{r},t),
+   where $v_{KS}[\rho]$ is the time-dependent Kohn-Sham potential that maps the
+   density of the non-interacting system to the density of the interacting one.
+   The density $\rho(\mathbf{r},t) = \sum_{i}^{N_{occ}}|\psi_{i}(\mathbf{r},t)|^}2|$ is the
+   sum over occupied orbitals and represents the real-space probability
+   distribution for finding an electron at $\mathbf{r}$ at time $t$.
+   RT-TDDFT is based on the explicit time-propagation of the time-dependent density. 
+
+   Wavefunction expanded in a Gaussian basis sets $\psi_{i}(\mathbf{r},t)=\sum_{i}^{N_{AO}} C_{\mu i}(t)\phi_{\mu}(x)$ 
+   The one-electron reduced density matrix $\gamma(x_{1},x_{2},t)=\sum_{i}^{N}\psi_i(x_{1},t)\psi^{*}_{i}(x_2,t)$
+
+   Direct integration of the von Neumann equation of motion for the one-electron
+   reduced density matrix $\gamma$ yields $\gamma(t) = U(t,t0)\gamma(t_0)U^{\dagger}(t,t0)$ where
+   $U(t,t_0) = T exp^{-i\int_{t0}^{t} H(\tau)d\tau}$. An expression for $U$ can
+   obtained using the Magnus expansion of the time-evolution operator where
+   $U(t,t_0)$ is written as matrix exponential, where the matrix is expressed in a
+   power-series-like expressions. Truncation at order $n$ constitutes an $n$th
+   order Magnus expansion. 
+  
+   The main challenge associated with the use of a Magnus expansion is the
+   requisite of knowing the Fock matrix for the subsequent time step. An
+   approximate F needs to be constructed. 
+
+   Casting the Magnus expansion as a deferred correction: In order to make
+   significant gains in the propagation of the reduced density matrix $\gamma$, it is
+   possible to avoid the expensive Fock build at each time step by replacing the
+   Fock build with a cheaper alternative followed by a periodic correction
+   scheme. Spectral deferred corrections (SDC) have been used to successfully
+   parallelize the time-dimension calculation of many problems in fluid dynamics
+   and [] and operate on the premise of performing a sweep where a cheap (coarse)
+   calculation is run and then corrected by an expensive (fine) calculation.
+   These methods have been primarily used where meshes for the time and space
+   dimensions are applied. 
+
+   The true power of an SDC-type method comes from the exploitation of the ratio
+   in the cost of the fine versus coarse propagator. Presently, the way that the
+   matrix exponential is computed in NWChem relies on either diagonalization or a
+   truncated power-series expression. On the diagonalization front (a typically
+   $O(N^3)$ FLOPs operation), significant speed ups can be obtained by considering
+   a coarser system.
+

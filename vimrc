@@ -6,9 +6,15 @@
 syntax enable 
 "--- plugins -------------------------------------------------------------------
 execute pathogen#infect()
+execute pathogen#helptags()
 let g:ctrlp_map='<C-p>'
 let g:ctrlp_cmd='CtrlP'
 let g:tex_flavor='latex'
+let g:Tex_GotoError=1
+let g:TCLevel=5
+let g:Tex_ViewRule_pdf='open -a Preview'
+let g:Tex_CompileRule_pdf='pdflatex --interaction=nonstopmode $*'
+let g:Tex_useMakefile=1
 filetype plugin indent on
 
 "--- basic options -------------------------------------------------------------
@@ -41,6 +47,8 @@ set viewoptions-=options
 "--- autocommands --------------------------------------------------------------
 au! bufenter .vimrc source %
 au! bufwritepost .vimrc source % " autosource .vimrc after write
+autocmd BufWinEnter *.py setlocal foldexpr=SimpylFold(v:lnum) foldmethod=expr
+autocmd BufWinLeave *.py setlocal foldexpr< foldmethod<
 au bufenter /private/tmp/crontab.* setl backupcopy=yes " crontab fix
 au bufenter * if (winnr("$") == 1 
    \ && exists("b:NERDTreeType")  && b:NERDTreeType == "primary") | q | endif

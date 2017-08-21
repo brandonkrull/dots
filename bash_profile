@@ -18,9 +18,7 @@ export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/bin/:~/bin/:$PATH:~/Dropbo
 export EDITOR=/usr/bin/vim
 export BASHRC=~/.bash_profile
 export VIMRC=~/.vimrc
-export EMACS=/usr/bin/emacs 
 export UNAME=$(uname)
-export TERM=xterm
 
 eval "$(thefuck --alias)"
 alias ll='ls -lhrt'
@@ -54,12 +52,24 @@ function git-branch-prompt {
 if [ "$UNAME" == "Darwin" ]; then
     color_prompt=yes
     PS1="[\[\e[32;1m\]\H \[\e[0m\]\w]\$(git-branch-prompt)\$ "
+    export TRASH=~/.Trash/
+    export DROPBOX=~/Dropbox/
+    export EMACS=/usr/local/bin/emacs
+    export SYSN=i686-apple-darwin9
+    color_prompt=yes
+    PS1="[\[\e[32;1m\]\H \[\e[0m\]\w]\$(git-branch-prompt)\$ "
+
+    alias emacs='/usr/local/Cellar/emacs-mac/emacs-24.5-z-mac-5.9/bin/emacs-24.5'
+    alias em='open -a Emacs.app'
+    alias log='em $HOME/Dropbox/bin/orgs/phd.org'
+    alias sed='gsed'
+    alias serve=''
 
     source /opt/intel/bin/compilervars.sh intel64 
-    export TURBOIMG=$HOME/devel/apps/TURBOIMG
-    export TURBODIR=$HOME/devel/apps/lrsh
-    source $TURBODIR/Config_turbo_env
-    export PATH=$TURBODIR/bin/`sysname`/:$TURBOIMG/bin/`sysname`:/usr/local/bin:$HOME/Dropbox/bin:$HOME/bin:$PATH
+    TURBOIMG=$HOME/devel/apps/TURBOIMG
+    TURBODIR=$HOME/devel/apps/lrsh
+    PATH=$HOME/anaconda/bin:$TURBODIR/bin/$SYSN:$TURBOIMG/bin/$SYSN:/usr/local/bin:$HOME/Dropbox/bin:$HOME/bin:$PATH
+    export TURBOIMG TURBODIR PATH 
     ulimit -s hard
 
     export PATH=/Users/bkrull/bin/anaconda/bin:/bin:/usr/local/bin:/usr/bin:/usr/sbin:/Applications/Atom.app/Contents/Resources/app/apm/bin:/usr/local/bin:/Users/bkrull/Dropbox/bin:/Users/bkrull/bin:/opt/intel/composer_xe_2015.3.187/bin/intel64:/opt/local/bin:/opt/local/sbin:/Users/bkrull/bin/:/opt/X11/bin:/usr/local/MacGPG2/bin:/Library/TeX/texbin:/Users/bkrull/Dropbox/bin:/opt/intel/composer_xe_2015.3.187/debugger/gdb/intel64/bin:/usr/local/macports/bin
@@ -89,7 +99,7 @@ elif [ "$UNAME" == "Linux" ]; then
     BASHRC=$HOME/.bashrc
     WORK=/work/bkrull
     TURBOIMG=$WORK/apps/TURBOIMG
-    PATH=$TURBOIMG/bin/em64t-unknown-linux-gnu:$TURBOIMG/scripts:$PATH
+    PATH=$HOME/anaconda/bin:$TURBOIMG/bin/em64t-unknown-linux-gnu:$TURBOIMG/scripts:$PATH
     export BASHRC WORK TURBOIMG PATH
     alias log='emacs -nw $HOME/Dropbox/bin/orgs/phd.org'
     alias backupgp='rsync -rt --max-size=50m gplogin2:~/calcs/ ~/calcs/ &'
@@ -97,7 +107,6 @@ elif [ "$UNAME" == "Linux" ]; then
     function ev { evince $1 &>/dev/null& }
     function mol { molden $1 &>/dev/null& }
     function tl {
-        module load intel
         ulimit -s unlimited
         case "$1" in
             0 ) 
@@ -132,3 +141,10 @@ else
         ;;
     esac 
 fi 
+export PATH=/Users/bkrull/bin/anaconda/bin:/bin:/usr/bin:/usr/sbin:/usr/local/bin/:/Applications/Atom.app/Contents/Resources/app/apm/bin:/usr/local/bin:/Users/bkrull/Dropbox/bin:/Users/bkrull/bin:/opt/intel/composer_xe_2015.3.187/bin/intel64:/opt/local/bin:/opt/local/sbin:/Users/bkrull/bin/:/opt/X11/bin:/usr/local/MacGPG2/bin:/Library/TeX/texbin:/Users/bkrull/Dropbox/bin:/opt/intel/composer_xe_2015.3.187/debugger/gdb/intel64/bin
+
+PATH="/Users/bkrull/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/Users/bkrull/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/Users/bkrull/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/Users/bkrull/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/Users/bkrull/perl5"; export PERL_MM_OPT;
