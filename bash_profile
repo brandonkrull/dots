@@ -34,6 +34,7 @@ alias ssh='TERM=xterm ssh'
 alias v='vim'
 alias math='/Applications/Mathematica.app/Contents/MacOS/WolframKernel'
 alias seasonsearch='ssh -i ~/.seasonsearch/seasonsearch-dev.pem ubuntu@52.42.211.91'
+alias start_ss_redis='ssh -f -N -L6379:172.31.19.136:6379 ubuntu@52.42.211.91'
 
 #GIT----------------------------------------------------------------------------
 source ~/.git-completion.bash
@@ -80,8 +81,6 @@ if [ "$UNAME" == "Darwin" ]; then
     PERL_MB_OPT="--install_base \"/Users/bkrull/perl5\""; export PERL_MB_OPT;
     PERL_MM_OPT="INSTALL_BASE=/Users/bkrull/perl5"; export PERL_MM_OPT;
 
-    # added by Anaconda2 4.3.0 installer
-    export PATH="/Users/bkrull/bin/anaconda/anaconda/bin:$PATH"
 elif [ "$UNAME" == "Linux" ]; then
     if [ -x /usr/bin/dircolors ]; then
         eval "`dircolors -b`"
@@ -148,3 +147,6 @@ PERL5LIB="/Users/bkrull/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5L
 PERL_LOCAL_LIB_ROOT="/Users/bkrull/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
 PERL_MB_OPT="--install_base \"/Users/bkrull/perl5\""; export PERL_MB_OPT;
 PERL_MM_OPT="INSTALL_BASE=/Users/bkrull/perl5"; export PERL_MM_OPT;
+
+# added by Anaconda2 4.3.0 installer
+    export PATH="/Users/bkrull/bin/anaconda/anaconda/bin:$PATH"
