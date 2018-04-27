@@ -31,25 +31,29 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     html
-     yaml
-     vimscript
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
+     html
+     yaml
      helm
+     pandoc
      auto-completion
      better-defaults
      emacs-lisp
      git
      markdown
      org
-     python
-     latex
+     (python :variables python-test-runner 'pytest)
+     (latex :variables
+            latex-build-command "LaTeX"
+            latex-enable-auto-fill t
+            )
      bibtex
      (shell :variables
+            shell-default-shell 'term
             shell-default-height 30
             shell-default-position 'bottom)
      spell-checking
@@ -65,7 +69,9 @@ values."
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages '(
+                                    fill-column-indicator
+                                    info+)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -134,7 +140,6 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(apropospriate-dark
-                         spacemacs-dark
                          spacemacs-light)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -300,7 +305,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (let ((path (shell-command-to-string ". ~/.bash_profile; echo -n $PATH")))
     (setenv "PATH" path)
-    (setq exec-path 
+    (setq exec-path
           (append
            (split-string-and-unquote path ":")
            exec-path)))
