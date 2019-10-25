@@ -47,7 +47,7 @@ export TRASH=~/.Trash/
 export SYSN=i686-apple-darwin9
 export PROMPT_DIRTRIM=3
 color_prompt=yes
-PS1="[\[\e[32;1m\]\H \[\e[0m\]\W]\$(git-branch-prompt)\$ "
+PS1="[\[\e[32;1m\]\u \[\e[0m\]\W]\$(git-branch-prompt)\$ "
 
 alias sed='gsed'
 alias ctags='/usr/local/bin/ctags'
@@ -61,7 +61,7 @@ if [ $? -eq 0 ]; then
     \eval "$__conda_setup"
 else
     if [ -f "/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/anaconda3/etc/profile.d/conda.sh"
+# . "/anaconda3/etc/profile.d/conda.sh"  # commented out by conda initialize
         CONDA_CHANGEPS1=false conda activate base
     else
         \export PATH="/anaconda3/bin:$PATH"
@@ -78,3 +78,36 @@ function em {
           emacsclient -nq "$@" &> /dev/null
     fi
 }
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/Users/bk/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/Users/bk/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/bk/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/Users/bk/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+export PATH="/usr/local/opt/ruby@2.5/bin:$PATH"
+export CPPFLAGS="-I/usr/local/opt/ruby@2.5/include"
+export LDFLAGS="-L/usr/local/opt/ruby@2.5/lib"
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+if [ -d /usr/local/al-scripts/profile.d ]; then
+  for config in /usr/local/al-scripts/profile.d/*.sh; do
+    if [ -r $config ]; then
+      . $config
+    fi
+  done
+fi
+export PATH="/usr/local/opt/ruby/bin:$PATH"
